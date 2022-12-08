@@ -1,58 +1,135 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import AddCourse from "./AddCourse";
 import Selector from "./Selector";
 
-interface course {
-  course: string;
-  cgpa: number;
+interface courseInterface {
+  courseName: string;
+  cgpa: string;
 }
 
-interface semester {
-  session: string;
-  courses: course[];
+interface semesterInterface {
+  sessionName: string;
+  year: string,
+  courses: courseInterface[];
 }
 
-const semesterOptions = ["Spring", "Summer", "Fall"];
+const sessionOptions = ["Spring", "Summer", "Fall"];
 
 const yearOptions = ["2018", "2019", "2020", "2021", "2022"];
 
-const cgpa = ['.7', '1.3', '1.7', '2.0', '2.3', '2.7', '3.0', '3.3', '3.7', '4.0']
-
 const AddSemester = () => {
-  const semesterRef = useRef<semester>(null);
+  const [semester, setSemester] = useState<semesterInterface>({
+    sessionName: '',
+    year: '',
+    courses: [],
+  })
+
+  const [error, setError] = useState<string>('');
+
+  const isAbleToAddCourse = (value: string) => {
+    setError('');
+    let flag = true;
+    if(semester.courses.length == 5) {
+      setError('Can add upto 5 courses')
+      flag = false;
+    }
+
+    semester.courses.map((course: courseInterface) => {
+      if(course.courseName === value) {
+        setError(`Course ${value} is already added`)
+        flag = false;
+        return;
+      }
+    })
+
+    return flag;
+  }
+
+  const handleAddCourse = ({courseName, cgpa}: courseInterface) => {
+    if(isAbleToAddCourse(courseName))
+      setSemester({ ...semester, courses: [ ...semester.courses, {courseName, cgpa}] })
+  }
+
+  const handleRemoveCourse = (courseName: string) => {
+    setSemester({ ...semester, courses: semester.courses.filter((course: courseInterface) => course.courseName !== courseName) })    
+  }
+
+  const handleGetsemesterName = (value: string) => setSemester({...semester, sessionName: value});
+
+  const handleGetYear = (value: string) => setSemester({...semester, year: value});
+
+  const calculateCGPA = (courses: courseInterface[]) => {
+
+    let total = 0.0
+
+    courses.map((course: courseInterface) => {
+      total += parseFloat(course.cgpa);
+    })
+
+    return total / courses.length;
+  }
+
+  const handleSumbmit = () => {
+    setError('');
+
+    if(semester.courses.length <= 1) {
+      setError('Add atleast 2 courses');
+      return;
+    }
+    if(semester.sessionName == '') {
+      setError('Add semester');
+      return;
+    }
+    if(semester.year == '') {
+      setError('Add year');
+      return;
+    }
+  }
 
   return (
     <div className="mt-12">
       <div className="lg:w-4/6 md:w-5/6 bg-gray-800 bg-opacity-50 rounded-lg p-8 flex flex-col mx-auto w-full mt-10 md:mt-0">
         <h2 className="text-white text-2xl font-bold title-font mb-5">
-          Add Results 💀
+          Add Results 💀 
         </h2>
 
         {/* Session selector */}
         <label className="leading-7 text-md font-semibold text-gray-400">
-          Add Session
+          Add Semester
         </label>
         <div className="flex space-x-2 mb-4">
-          <Selector name="Semester" options={semesterOptions} />
-          <Selector name="Year" options={yearOptions} />
+          <Selector name="Session" options={sessionOptions} setter={handleGetsemesterName} />
+          <Selector name="Year" options={yearOptions} setter={handleGetYear} />
         </div>
+
+        {/* Display Selected Courses */}
+        {
+          semester.courses.length > 0 && <label className="leading-7 text-md font-semibold text-gray-400">
+            Selected Courses
+            <span className="text-gray-500 text-sm"> CGPA of this semester {calculateCGPA(semester.courses).toFixed(2)}</span>
+          </label>
+        }
+        <div className="mb-4">
+          {
+            semester.courses.map((course: courseInterface, index) => {
+              return (
+                <div key={index} className="cursor-pointer" onClick={() => handleRemoveCourse(course.courseName)}>
+                  <p key={course.courseName} className="font-semibold text-md">
+                  <span className="text-gray-300">Course {index + 1}: </span>
+                  {course.courseName} ➡️ {course.cgpa}</p> 
+                </div>
+              )
+            })
+          }
+        </div>
+
 
         {/* Add Courses */}
-        <label className="leading-7 text-md font-semibold text-gray-400">
-          Add Course 1
-        </label>
-        <div className="flex space-x-2 mb-4">
-          <input
-            placeholder="Name"
-            type="text"
-            className="w-full bg-gray-600 bg-opacity-20 focus:bg-transparent focus:ring-2 focus:ring-indigo-900 rounded border border-gray-600 focus:border-indigo-500 text-base outline-none text-gray-100 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-          />
-          <Selector name="CGPA" options={cgpa} />
-          <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-sm font-medium">
-            Add
-          </button>
-        </div>
+        <AddCourse handleAddCourse={handleAddCourse} counter={semester.courses.length + 1} />
 
-        <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium">
+        <p className="text-lg text-red-500 font-semibold">{error}</p>
+
+        <button onClick={handleSumbmit} className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium">
           Submit 🚀
         </button>
       </div>
