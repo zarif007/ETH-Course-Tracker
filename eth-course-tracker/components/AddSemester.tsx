@@ -113,7 +113,7 @@ const AddSemester = () => {
           {
             semester.courses.map((course: courseInterface, index) => {
               return (
-                <div key={index} className="cursor-pointer" onClick={() => handleRemoveCourse(course.courseName)}>
+                <div key={index} className="cursor-pointer text-white" onClick={() => handleRemoveCourse(course.courseName)}>
                   <p key={course.courseName} className="font-semibold text-md">
                   <span className="text-gray-300">Course {index + 1}: </span>
                   {course.courseName} ➡️ {course.cgpa}</p> 
