@@ -32,10 +32,10 @@ const Selector = ({ name, options, setter }: any) => {
               <Combobox.Option
                 key={index}
                 value={option}
-                className="cursor-pointer flex items-center space-x-2 px-2 py-1 rounded-md bg-black hover:bg-indigo-900"
+                className="cursor-pointer flex items-center space-x-2 px-2 py-1 rounded-md bg-black hover:bg-indigo-900 text-white"
                 onClick={() => setter(option)}
               >
-                <p className="text-md font-semibold">{option}</p>
+                <p className="text-md font-semibold ">{option}</p>
               </Combobox.Option>
             ))
           ) : (
