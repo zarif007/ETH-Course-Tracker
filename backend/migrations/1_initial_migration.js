@@ -1,5 +1,5 @@
-const Migrations = artifacts.require("Migrations");
+const SemesterContract = artifacts.require("SemesterContract");
 
 module.exports = function (deployer) {
-  deployer.deploy(Migrations);
+  deployer.deploy(SemesterContract);
 };

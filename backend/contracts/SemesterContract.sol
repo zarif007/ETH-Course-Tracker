@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.13;
 
 contract SemesterContract {
   
@@ -7,25 +7,27 @@ contract SemesterContract {
 
   struct Course {
       string courseName;
-      uint256 cgpa;
+      string cgpa;
   }
 
   struct SemesterDetails {
       uint id; 
       string sessionName;
       string year;
-      Course[] courses;
+      string[] courses;
+      string[] cgpa;
   }
 
-  SemesterDetails[] private semestersDetails;
+  SemesterDetails[] semestersDetails;
 
   mapping(uint256 => address) semesterToStudent;
 
-  function addSemester(string memory sessionName, string memory year, Course[] memory course) external {
+
+  function addSemester(string memory sessionName, string memory year, string[] memory courses, string[] memory cgpas) external {
 
     uint id = semestersDetails.length;
-    
-    semestersDetails.push(SemesterDetails(id, sessionName, year, course));
+
+    semestersDetails.push(SemesterDetails(id, sessionName, year, courses, cgpas));
 
     semesterToStudent[id] = msg.sender;
 
