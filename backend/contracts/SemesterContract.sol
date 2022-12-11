@@ -5,16 +5,11 @@ contract SemesterContract {
   
   event AddSemester(address recipient, uint id);
 
-  struct Course {
-      string courseName;
-      string cgpa;
-  }
-
   struct SemesterDetails {
       uint id; 
       string sessionName;
       string year;
-      string[] courses;
+      string[] courseNames;
       string[] cgpa;
   }
 
@@ -23,11 +18,11 @@ contract SemesterContract {
   mapping(uint256 => address) semesterToStudent;
 
 
-  function addSemester(string memory sessionName, string memory year, string[] memory courses, string[] memory cgpas) external {
+  function addSemester(string memory sessionName, string memory year, string[] memory courseNames, string[] memory cgpas) external {
 
     uint id = semestersDetails.length;
 
-    semestersDetails.push(SemesterDetails(id, sessionName, year, courses, cgpas));
+    semestersDetails.push(SemesterDetails(id, sessionName, year, courseNames, cgpas));
 
     semesterToStudent[id] = msg.sender;
 
