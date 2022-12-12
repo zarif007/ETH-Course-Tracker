@@ -1,6 +1,10 @@
-import React, { useRef, useState } from "react";
+import { ethers } from "ethers";
+import React, { useEffect, useState } from "react";
+import { semesterContractAddress } from "../config";
 import AddCourse from "./AddCourse";
 import Selector from "./Selector";
+import SemesterAbi from "../../backend/build/contracts/SemesterContract.json";
+import Semester from "./Semester";
 
 interface courseInterface {
   courseName: string;
@@ -9,7 +13,7 @@ interface courseInterface {
 
 interface semesterInterface {
   sessionName: string;
-  year: string,
+  year: string;
   courses: courseInterface[];
 }
 
@@ -19,78 +23,124 @@ const yearOptions = ["2018", "2019", "2020", "2021", "2022"];
 
 const AddSemester = () => {
   const [semester, setSemester] = useState<semesterInterface>({
-    sessionName: '',
-    year: '',
+    sessionName: "",
+    year: "",
     courses: [],
-  })
+  });
 
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
+
+  const [isUploaded, setIsUploaded] = useState<boolean>(false);
 
   const isAbleToAddCourse = (value: string) => {
-    setError('');
+    setError("");
     let flag = true;
-    if(semester.courses.length == 5) {
-      setError('Can add upto 5 courses')
+    if (semester.courses.length == 5) {
+      setError("Can add upto 5 courses");
       flag = false;
     }
 
     semester.courses.map((course: courseInterface) => {
-      if(course.courseName === value) {
-        setError(`Course ${value} is already added`)
+      if (course.courseName === value) {
+        setError(`Course ${value} is already added`);
         flag = false;
         return;
       }
-    })
+    });
 
     return flag;
-  }
+  };
 
-  const handleAddCourse = ({courseName, cgpa}: courseInterface) => {
-    if(isAbleToAddCourse(courseName))
-      setSemester({ ...semester, courses: [ ...semester.courses, {courseName, cgpa}] })
-  }
+  const handleAddCourse = ({ courseName, cgpa }: courseInterface) => {
+    if (isAbleToAddCourse(courseName))
+      setSemester({
+        ...semester,
+        courses: [...semester.courses, { courseName, cgpa }],
+      });
+  };
 
   const handleRemoveCourse = (courseName: string) => {
-    setSemester({ ...semester, courses: semester.courses.filter((course: courseInterface) => course.courseName !== courseName) })    
-  }
+    setSemester({
+      ...semester,
+      courses: semester.courses.filter(
+        (course: courseInterface) => course.courseName !== courseName
+      ),
+    });
+  };
 
-  const handleGetsemesterName = (value: string) => setSemester({...semester, sessionName: value});
+  const handleGetsemesterName = (value: string) =>
+    setSemester({ ...semester, sessionName: value });
 
-  const handleGetYear = (value: string) => setSemester({...semester, year: value});
+  const handleGetYear = (value: string) =>
+    setSemester({ ...semester, year: value });
 
   const calculateCGPA = (courses: courseInterface[]) => {
-
-    let total = 0.0
+    let total = 0.0;
 
     courses.map((course: courseInterface) => {
       total += parseFloat(course.cgpa);
-    })
+    });
 
     return total / courses.length;
-  }
+  };
 
   const handleSumbmit = () => {
-    setError('');
+    setError("");
 
-    if(semester.courses.length <= 1) {
-      setError('Add atleast 2 courses');
+    if (semester.courses.length <= 1) {
+      setError("Add atleast 2 courses");
       return;
     }
-    if(semester.sessionName == '') {
-      setError('Add semester');
+    if (semester.sessionName == "") {
+      setError("Add semester");
       return;
     }
-    if(semester.year == '') {
-      setError('Add year');
+    if (semester.year == "") {
+      setError("Add year");
       return;
     }
-  }
+
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+
+        const SemesterContract = new ethers.Contract(
+          semesterContractAddress,
+          SemesterAbi.abi,
+          signer
+        );
+
+        const courseName: string[] = [];
+        const cgpas: string[] = [];
+
+        semester.courses.map((course: courseInterface) => {
+          courseName.push(course.courseName);
+          cgpas.push(course.cgpa);
+        });
+
+        SemesterContract.addSemester(
+          semester.sessionName,
+          semester.year,
+          courseName,
+          cgpas
+        ).then((res: any) => {
+          console.log(res)
+          setIsUploaded(true)
+        });
+      }
+    } catch (error) {
+      console.log("No Ethereum");
+    }
+  };
 
   return (
     <div className="mt-4">
       <div className="lg:w-4/6 md:w-5/6 bg-gray-800 bg-opacity-50 rounded-lg p-8 flex flex-col mx-auto w-full mt-10 md:mt-0">
         <h2 className="text-white text-2xl font-bold title-font mb-5">
-          Add Results 💀 
+          Add Results 💀
         </h2>
 
         {/* Session selector */}
@@ -98,40 +148,58 @@ const AddSemester = () => {
           Add Semester
         </label>
         <div className="flex space-x-2 mb-4">
-          <Selector name="Session" options={sessionOptions} setter={handleGetsemesterName} />
+          <Selector
+            name="Session"
+            options={sessionOptions}
+            setter={handleGetsemesterName}
+          />
           <Selector name="Year" options={yearOptions} setter={handleGetYear} />
         </div>
 
         {/* Display Selected Courses */}
-        {
-          semester.courses.length > 0 && <label className="leading-7 text-md font-semibold text-gray-400">
+        {semester.courses.length > 0 && (
+          <label className="leading-7 text-md font-semibold text-gray-400">
             Selected Courses
-            <span className="text-gray-500 text-sm"> CGPA of this semester {calculateCGPA(semester.courses).toFixed(2)}</span>
+            <span className="text-gray-500 text-sm">
+              {" "}
+              CGPA of this semester {calculateCGPA(semester.courses).toFixed(2)}
+            </span>
           </label>
-        }
+        )}
         <div className="mb-4">
-          {
-            semester.courses.map((course: courseInterface, index) => {
-              return (
-                <div key={index} className="cursor-pointer text-white" onClick={() => handleRemoveCourse(course.courseName)}>
-                  <p key={course.courseName} className="font-semibold text-md">
+          {semester.courses.map((course: courseInterface, index) => {
+            return (
+              <div
+                key={index}
+                className="cursor-pointer text-white"
+                onClick={() => handleRemoveCourse(course.courseName)}
+              >
+                <p key={course.courseName} className="font-semibold text-md">
                   <span className="text-gray-300">Course {index + 1}: </span>
-                  {course.courseName} ➡️ {course.cgpa}</p> 
-                </div>
-              )
-            })
-          }
+                  {course.courseName} ➡️ {course.cgpa}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
-
         {/* Add Courses */}
-        <AddCourse handleAddCourse={handleAddCourse} counter={semester.courses.length + 1} />
+        <AddCourse
+          handleAddCourse={handleAddCourse}
+          counter={semester.courses.length + 1}
+        />
 
         <p className="text-lg text-red-500 font-semibold">{error}</p>
 
-        <button onClick={handleSumbmit} className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium">
+        <button
+          onClick={handleSumbmit}
+          className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium"
+        >
           Submit 🚀
         </button>
+      </div>
+      <div className="mt-8">
+        {isUploaded && <Semester semester={semester} />}
       </div>
     </div>
   );

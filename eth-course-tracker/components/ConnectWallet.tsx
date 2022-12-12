@@ -1,10 +1,15 @@
 import { ethers } from 'ethers'
 import React, { useState } from 'react'
+import { useEffect } from 'react';
 
 const ConnectWallet = () => {
   
   const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
   const [currentAccount, setCurrentAccount] = useState<string>('');
+
+  useEffect(() => {
+    connectWallet()
+  }, []);
 
   const connectWallet = async () => {
     try {

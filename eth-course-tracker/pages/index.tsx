@@ -1,13 +1,13 @@
 import AddSemester from '../components/AddSemester';
-import semesterABI from '../../backend/build/contracts/SemesterContract.json'
-import { semesterContractAddress } from './../config';
 import ConnectWallet from '../components/ConnectWallet';
+import DisplaySemesters from '../components/DisplaySemesters';
 
 export default function Home() {
   return (
     <div>
       <ConnectWallet />
       <AddSemester />
+      <DisplaySemesters />
     </div>
   )
 }
