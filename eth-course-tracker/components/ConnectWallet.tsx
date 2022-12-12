@@ -17,7 +17,6 @@ const ConnectWallet = () => {
 
         let accounts = await ethereum.request({method: 'eth_requestAccounts'})
 
-        console.log('Account', accounts);
         setIsUserLoggedIn(true);
         setCurrentAccount(accounts[0])
     } catch(error) {
@@ -25,10 +24,13 @@ const ConnectWallet = () => {
     }
   }
   return (
-    <div>
-        <button onClick={connectWallet} className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium">
-          Connect Wallet 🦊
-        </button>
+    <div className='flex justify-center mt-12'>
+        <div className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium">
+          {
+            isUserLoggedIn ? <div>{currentAccount}</div> : 
+            <button onClick={connectWallet}>Connect Wallet 🦊</button>
+          }
+        </div>
     </div>
   )
 }

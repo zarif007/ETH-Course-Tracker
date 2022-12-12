@@ -87,7 +87,7 @@ const AddSemester = () => {
   }
 
   return (
-    <div className="mt-12">
+    <div className="mt-4">
       <div className="lg:w-4/6 md:w-5/6 bg-gray-800 bg-opacity-50 rounded-lg p-8 flex flex-col mx-auto w-full mt-10 md:mt-0">
         <h2 className="text-white text-2xl font-bold title-font mb-5">
           Add Results 💀 
