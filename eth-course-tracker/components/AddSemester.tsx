@@ -5,17 +5,9 @@ import AddCourse from "./AddCourse";
 import Selector from "./Selector";
 import SemesterAbi from "../../backend/build/contracts/SemesterContract.json";
 import Semester from "./Semester";
-
-interface courseInterface {
-  courseName: string;
-  cgpa: string;
-}
-
-interface semesterInterface {
-  sessionName: string;
-  year: string;
-  courses: courseInterface[];
-}
+import { semesterInterface } from "../Interfaces/SemesterInterface";
+import { courseInterface } from "../Interfaces/CourseInterface";
+import { calculateCGPA } from "../functions/calculateCGPA";
 
 const sessionOptions = ["Spring", "Summer", "Fall"];
 
@@ -73,16 +65,6 @@ const AddSemester = () => {
 
   const handleGetYear = (value: string) =>
     setSemester({ ...semester, year: value });
-
-  const calculateCGPA = (courses: courseInterface[]) => {
-    let total = 0.0;
-
-    courses.map((course: courseInterface) => {
-      total += parseFloat(course.cgpa);
-    });
-
-    return total / courses.length;
-  };
 
   const handleSumbmit = () => {
     setError("");
@@ -199,7 +181,10 @@ const AddSemester = () => {
         </button>
       </div>
       <div className="mt-8">
-        {isUploaded && <Semester semester={semester} />}
+        {isUploaded && <div className="flex flex-col ">
+          <p className="bg-indigo-500 font-bold text-lg my-2 p-4 mx-auto">Now added</p>
+          <Semester semester={semester} />
+        </div>}
       </div>
     </div>
   );
