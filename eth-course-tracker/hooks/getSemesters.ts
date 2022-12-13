@@ -2,6 +2,8 @@ import { ethers } from "ethers";
 import { useQuery } from "react-query";
 import { semesterContractAddress } from "../config";
 import SemesterAbi from "../../backend/build/contracts/SemesterContract.json";
+import { useGetWalletAddress } from "./connectWallet";
+
 
 const formatSemesters = (semesters: any) => {
     const formatted: any = [];
@@ -9,14 +11,14 @@ const formatSemesters = (semesters: any) => {
     semesters.map((semester: any) => {
       const semObj: any = {};
   
-      semObj.sessionName = semester[1];
-      semObj.year = semester[2];
+      semObj.sessionName = semester[2];
+      semObj.year = semester[3];
       semObj.courses = [];
   
-      for(let i=0; i<semester[3].length; i++) {
+      for(let i=0; i<semester[4].length; i++) {
         const crObj = {
-          courseName: semester[3][i],
-          cgpa: semester[4][i],
+          courseName: semester[4][i],
+          cgpa: semester[5][i],
         }
   
         semObj.courses.push(crObj);
@@ -43,12 +45,14 @@ const getSemesters = async () => {
         );
 
         const allSemesters = await SemesterContract.getSemstersByAUser();
+        console.log(allSemesters)
         return formatSemesters(allSemesters);
       }
     } catch (error) {
       console.log("No Ethereum");
     }
   };
+
 
 export const useGetSemesters = () =>
   useQuery(["get-semesters"], getSemesters);

@@ -33,10 +33,13 @@ const DisplaySemesters = () => {
             </div>
           );
         })}
-        <span className="text-gray-200 text-xl mt-2 flex justify-center font-bold">
-          {" "}
-          Total CGPA {totalCGPA.toFixed(2)}
-        </span>
+        {
+          semesters?.length > 0 && 
+          <span className="text-gray-200 text-xl mt-2 flex justify-center font-bold">
+            {" "}
+            Total CGPA {totalCGPA.toFixed(2)}
+          </span>
+        }
     </div>
   );
 };

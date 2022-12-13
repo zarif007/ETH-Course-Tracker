@@ -7,10 +7,11 @@ contract SemesterContract {
 
   struct SemesterDetails {
       uint id; 
+      string studentId;
       string sessionName;
       string year;
       string[] courseNames;
-      string[] cgpa;
+      string[] cgpas;
   }
 
   SemesterDetails[] semestersDetails;
@@ -18,11 +19,11 @@ contract SemesterContract {
   mapping(uint256 => address) semesterToStudent;
 
 
-  function addSemester(string memory sessionName, string memory year, string[] memory courseNames, string[] memory cgpas) external {
+  function addSemester(string memory studentId, string memory sessionName, string memory year, string[] memory courseNames, string[] memory cgpas) external {
 
     uint id = semestersDetails.length;
 
-    semestersDetails.push(SemesterDetails(id, sessionName, year, courseNames, cgpas));
+    semestersDetails.push(SemesterDetails(id, studentId, sessionName, year, courseNames, cgpas));
 
     semesterToStudent[id] = msg.sender;
 
@@ -33,21 +34,11 @@ contract SemesterContract {
 
     SemesterDetails[] memory temp = new SemesterDetails[](semestersDetails.length);
 
-    uint counter = 0;
-
     for(uint i=0; i<semestersDetails.length; i++) {
-      if(semesterToStudent[i] == msg.sender){
-        temp[counter++] = semestersDetails[i];
-      }
+      temp[i] = semestersDetails[i];
     }
 
-    SemesterDetails[] memory result = new SemesterDetails[](counter);
-
-    for(uint i=0; i<counter; i++) {
-      result[i] = temp[i];
-    }
-
-    return result;
+    return temp;
   }
 
 }

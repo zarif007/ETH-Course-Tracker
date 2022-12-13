@@ -1,1 +1,2 @@
-export const semesterContractAddress = '0xf72dD61358E768CD523DcEB582717A609116EDAF';
+export const semesterContractAddress = '0x0a897f57B426659F9AaE43E28c5d6B6BF09110Bb';
+                                        

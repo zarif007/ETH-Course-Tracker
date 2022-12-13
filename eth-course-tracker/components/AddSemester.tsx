@@ -15,6 +15,7 @@ const yearOptions = ["2018", "2019", "2020", "2021", "2022"];
 
 const AddSemester = () => {
   const [semester, setSemester] = useState<semesterInterface>({
+    studentId: "",
     sessionName: "",
     year: "",
     courses: [],
@@ -81,6 +82,10 @@ const AddSemester = () => {
       setError("Add year");
       return;
     }
+    if (semester.studentId == "") {
+      setError("Add student id");
+      return;
+    }
 
     try {
       const { ethereum } = window;
@@ -104,13 +109,14 @@ const AddSemester = () => {
         });
 
         SemesterContract.addSemester(
+          semester.studentId,
           semester.sessionName,
           semester.year,
           courseName,
           cgpas
         ).then((res: any) => {
-          console.log(res)
-          setIsUploaded(true)
+          console.log(res);
+          setIsUploaded(true);
         });
       }
     } catch (error) {
@@ -124,6 +130,21 @@ const AddSemester = () => {
         <h2 className="text-white text-2xl font-bold title-font mb-5">
           Add Results 💀
         </h2>
+
+        {/* Student id */}
+        <label className="leading-7 text-md font-semibold text-gray-400">
+          Enter ID
+        </label>
+        <div className="flex space-x-2 mb-4">
+          <input
+            onChange={(e: any) =>
+              setSemester({ ...semester, studentId: e.target.value })
+            }
+            placeholder="ID"
+            type="text"
+            className="w-full bg-gray-600 bg-opacity-20 focus:bg-transparent focus:ring-2 focus:ring-indigo-900 rounded border border-gray-600 focus:border-indigo-500 text-base outline-none text-gray-100 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+          />
+        </div>
 
         {/* Session selector */}
         <label className="leading-7 text-md font-semibold text-gray-400">
@@ -181,10 +202,14 @@ const AddSemester = () => {
         </button>
       </div>
       <div className="mt-8">
-        {isUploaded && <div className="flex flex-col ">
-          <p className="bg-indigo-500 font-bold text-lg my-2 p-4 mx-auto">Now added</p>
-          <Semester semester={semester} />
-        </div>}
+        {isUploaded && (
+          <div className="flex flex-col ">
+            <p className="bg-indigo-500 font-bold text-lg my-2 p-4 mx-auto">
+              Now added
+            </p>
+            <Semester semester={semester} />
+          </div>
+        )}
       </div>
     </div>
   );
