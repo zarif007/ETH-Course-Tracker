@@ -7,5 +7,5 @@ export const calculateCGPA = (courses: courseInterface[]) => {
     total += parseFloat(course.cgpa);
   });
 
-  return total / courses.length;
+  return courses.length > 0 ? total / courses.length : 0;
 };

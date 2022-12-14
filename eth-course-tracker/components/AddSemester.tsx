@@ -8,6 +8,7 @@ import Semester from "./Semester";
 import { semesterInterface } from "../Interfaces/SemesterInterface";
 import { courseInterface } from "../Interfaces/CourseInterface";
 import { calculateCGPA } from "../functions/calculateCGPA";
+import { useGetWalletAddress } from "../hooks/connectWallet";
 
 const sessionOptions = ["Spring", "Summer", "Fall"];
 
@@ -20,6 +21,8 @@ const AddSemester = () => {
     year: "",
     courses: [],
   });
+
+  const { isLoading, isError, data: address } = useGetWalletAddress();
 
   const [error, setError] = useState<string>("");
 
@@ -196,7 +199,8 @@ const AddSemester = () => {
 
         <button
           onClick={handleSumbmit}
-          className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium"
+          disabled={!address}
+          className="text-white disabled:cursor-not-allowed bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-xl font-medium"
         >
           Submit 🚀
         </button>

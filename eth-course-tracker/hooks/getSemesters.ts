@@ -10,7 +10,8 @@ const formatSemesters = (semesters: any) => {
   
     semesters.map((semester: any) => {
       const semObj: any = {};
-  
+      
+      semObj.studentId = semester[1];
       semObj.sessionName = semester[2];
       semObj.year = semester[3];
       semObj.courses = [];
@@ -45,7 +46,7 @@ const getSemesters = async () => {
         );
 
         const allSemesters = await SemesterContract.getSemstersByAUser();
-        console.log(allSemesters)
+        console.log(formatSemesters(allSemesters))
         return formatSemesters(allSemesters);
       }
     } catch (error) {
